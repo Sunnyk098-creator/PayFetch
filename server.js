@@ -1,46 +1,40 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// 🔒 HIDDEN GAS URL
+// 🔒 HIDDEN GOOGLE APP SCRIPT URL
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx9G6idQXbdHVR3gNqFfnSrvWr5jRLUIJ9VTkiczGBVDn-y6Yr4FPGB8pYYLohnbaImWw/exec";
 
-// Allow static images and GIFs to load normally
-app.use(express.static(path.join(__dirname, 'public'), {
-    index: false,
-    setHeaders: (res, path, stat) => {
-        // Prevent direct access to js and css via express static
-        if (path.endsWith('.js') || path.endsWith('.css')) {
-            res.setHeader('Cache-Control', 'no-store');
-        }
-    }
-}));
-
-// Serve Main HTML
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// 🛑 SMART PROTECTION: CSS File
+// 🛑 1. SECURE ROUTE FOR CSS
 app.get('/style.css', (req, res) => {
+    // Check agar website ne CSS maanga hai ya user ne direct link open kiya hai
     if (req.headers['sec-fetch-dest'] === 'style') {
-        res.sendFile(path.join(__dirname, 'public', 'style.css'));
+        res.sendFile(path.join(__dirname, 'style.css'));
     } else {
-        res.status(403).json({ error: "Access Denied: Invalid Request" });
+        res.status(400).json({ error: "invalid parameters" });
     }
 });
 
-// 🛑 SMART PROTECTION: JS File
+// 🛑 2. SECURE ROUTE FOR MAIN SCRIPT
 app.get('/script.js', (req, res) => {
+    // Check agar website ne JS maanga hai ya user ne direct link open kiya hai
     if (req.headers['sec-fetch-dest'] === 'script') {
-        res.sendFile(path.join(__dirname, 'public', 'script.js'));
+        res.sendFile(path.join(__dirname, 'script.js'));
     } else {
-        res.status(403).json({ error: "Access Denied: Invalid Request" });
+        res.status(400).json({ error: "invalid parameters" });
     }
 });
 
-// ✅ SECURE INTERNAL API (Auto-fetch)
+// 🛑 3. SECURE ROUTE FOR API.JS (If exists)
+app.get('/api.js', (req, res) => {
+    if (req.headers['sec-fetch-dest'] === 'script') {
+        res.sendFile(path.join(__dirname, 'api.js'));
+    } else {
+        res.status(400).json({ error: "invalid parameters" });
+    }
+});
+
+// ✅ 4. REAL API FETCH (Ye normal kaam karega frontend ke liye)
 app.get('/api/fetch', async (req, res) => {
     const { note } = req.query;
     if (!note) return res.status(400).json({ error: "invalid parameters" });
@@ -54,6 +48,15 @@ app.get('/api/fetch', async (req, res) => {
     }
 });
 
+// ✅ 5. SERVE MAIN HTML
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// ✅ 6. SERVE ALL OTHER FILES NORMALLY (GIFs, JPGs, etc.)
+app.use(express.static(__dirname));
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Secure Server running on port ${PORT}`);
+    console.log(`Server running securely on port ${PORT}`);
 });
