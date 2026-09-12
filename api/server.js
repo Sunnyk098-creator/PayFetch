@@ -5,14 +5,14 @@ const app = express();
 // 🔒 HIDDEN GOOGLE APP SCRIPT URL
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx9G6idQXbdHVR3gNqFfnSrvWr5jRLUIJ9VTkiczGBVDn-y6Yr4FPGB8pYYLohnbaImWw/exec";
 
-// Main folder ka path (kyunki server.js ab 'api' folder mein hai)
-const rootDir = path.join(__dirname, '..');
+// Public folder ka sahi path
+const publicDir = path.join(__dirname, '..', 'public');
 
 // 🛑 1. SECURE CSS ROUTE
 app.get('/style.css', (req, res) => {
-    // Check agar website ne CSS maanga hai (valid) ya user ne direct link open kiya hai (invalid)
+    // Check: Website se request aayi hai ya direct link se?
     if (req.headers['sec-fetch-dest'] === 'style') {
-        res.sendFile(path.join(rootDir, 'style.css'));
+        res.sendFile(path.join(publicDir, 'style.css'));
     } else {
         res.status(400).json({ error: "invalid parameters" });
     }
@@ -20,9 +20,9 @@ app.get('/style.css', (req, res) => {
 
 // 🛑 2. SECURE JS ROUTE
 app.get('/script.js', (req, res) => {
-    // Check agar website ne JS maanga hai (valid)
+    // Check: Website se request aayi hai ya direct link se?
     if (req.headers['sec-fetch-dest'] === 'script') {
-        res.sendFile(path.join(rootDir, 'script.js'));
+        res.sendFile(path.join(publicDir, 'script.js'));
     } else {
         res.status(400).json({ error: "invalid parameters" });
     }
@@ -42,5 +42,4 @@ app.get('/api/fetch', async (req, res) => {
     }
 });
 
-// Vercel Serverless Function ke liye export
 module.exports = app;
