@@ -9,8 +9,6 @@
   "rewrites": [
     { "source": "/style.css", "destination": "/server.js" },
     { "source": "/script.js", "destination": "/server.js" },
-    { "source": "/api.js", "destination": "/server.js" },
-    { "source": "/api/fetch", "destination": "/server.js" },
-    { "source": "/", "destination": "/server.js" }
+    { "source": "/api/fetch", "destination": "/server.js" }
   ]
 }
