@@ -21,9 +21,9 @@ body {
     padding: 35px 25px; text-align: center; position: relative; overflow: hidden; min-height: 480px;
 }
 
-.step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease-in-out; flex-direction: column; align-items: center; width: 100%; }
-.step-container.active { display: flex; opacity: 1; transform: translateY(0); animation: slideUpFade 0.6s ease forwards; }
-@keyframes slideUpFade { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+.step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease-in-out; flex-direction: column; align-items: center; width: 100%; }
+.step-container.active { display: flex; opacity: 1; transform: translateY(0); animation: slideUpFade 0.5s ease forwards; }
+@keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 
 .success-icon img { width: 90px; margin-bottom: 15px; transform: scale(0); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards; }
 @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
@@ -34,9 +34,11 @@ body {
 .name-text { font-size: 1.35rem; font-weight: 800; color: #2c3e50; text-transform: uppercase; }
 .badge, .inline-icon { width: 22px; height: 22px; object-fit: contain; }
 
-.timer-box { margin-top: 10px; padding: 6px 15px; background: rgba(255, 107, 107, 0.15); color: #e74c3c; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
+.timer-box { display: flex; align-items: center; justify-content: center; margin-top: 10px; padding: 6px 15px; background: rgba(255, 107, 107, 0.15); color: #e74c3c; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
 .amount-card { background: linear-gradient(135deg, #a8c0ff, #3f2b96); color: #fff; padding: 12px 35px; border-radius: 25px; font-size: 1.8rem; font-weight: 800; box-shadow: 0 6px 20px rgba(63, 43, 150, 0.3); margin-bottom: 20px; }
-.qr-container { background: #fff; padding: 20px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.qr-container { background: #fff; padding: 20px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); margin-bottom: 20px; position: relative; }
+#qrcode { display: flex; justify-content: center; align-items: center; }
+.qr-center-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 55px; height: 55px; background: #fff; border-radius: 50%; padding: 5px; }
 
 .auto-fetch-loader { display: flex; align-items: center; justify-content: center; gap: 10px; color: #0b7a59; font-weight: 700; font-size: 0.95rem; background: rgba(32, 201, 151, 0.15); padding: 12px; border-radius: 16px; width: 100%; border: 1px solid rgba(32, 201, 151, 0.3); margin-bottom: 15px; }
 .pulse-dot { width: 12px; height: 12px; background: #20c997; border-radius: 50%; animation: pulse 1.5s infinite; }
@@ -54,7 +56,7 @@ body {
 .currency-symbol { font-size: 1.6rem; font-weight: 700; color: #555; margin-right: 10px; }
 .custom-amount-input { border: none; outline: none; font-size: 1.8rem; font-weight: 700; width: 100%; color: #333; background: transparent; }
 
-.footer { margin-top: 15px; font-size: 0.8rem; color: #666; font-weight: 500; }
+.footer { margin-top: 15px; font-size: 0.8rem; color: #666; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .status-text { font-size: 1.6rem; font-weight: 800; margin-bottom: 5px; color: #20c997; }
 .sub-text { font-size: 0.95rem; color: #666; font-weight: 500; margin-bottom: 25px; }
 .receipt-box { background: #f8f9fa; padding: 15px; border-radius: 16px; border: 1px solid #e9ecef; width: 100%; text-align: left; font-size: 0.95rem; margin-bottom: 20px; }
