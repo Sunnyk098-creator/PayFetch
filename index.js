@@ -5,6 +5,7 @@ const app = express();
 // 🔒 HIDDEN GOOGLE APP SCRIPT URL
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx9G6idQXbdHVR3gNqFfnSrvWr5jRLUIJ9VTkiczGBVDn-y6Yr4FPGB8pYYLohnbaImWw/exec";
 
+// Public folder ka path jahan aapki HTML, CSS, JS aur GIFs hain
 const publicDir = path.join(process.cwd(), 'public');
 
 // 🛑 1. SECURE CSS ROUTE
@@ -39,6 +40,13 @@ app.get('/api/fetch', async (req, res) => {
     }
 });
 
-// DO NOT USE app.listen() HERE
-// Vercel requires exporting the app instead
+// ✅ 4. SERVE HOME PAGE
+app.get('/', (req, res) => {
+    res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+// ✅ 5. SERVE ALL OTHER FILES (GIFs, Logos, etc.)
+app.use(express.static(publicDir));
+
+// Vercel Serverless ke liye export zaroori hai (app.listen nahi lagana)
 module.exports = app;
