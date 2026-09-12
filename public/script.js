@@ -15,7 +15,8 @@ function switchStep(fromId, toId) {
     setTimeout(() => {
         fromEl.style.display = "none";
         toEl.style.display = "flex";
-        setTimeout(() => toEl.classList.add("active"), 50);
+        // Chhota delay taaki display flex apply ho jaye animation se pehle
+        setTimeout(() => toEl.classList.add("active"), 30);
     }, 400); 
 }
 
@@ -25,18 +26,25 @@ function generatePayment() {
 
     currentAmount = parseFloat(amt);
     currentNote = "SK" + Math.floor(10000 + Math.random() * 90000); 
-    showQRScreen(TIME_LIMIT);
+    
+    // Switch to Loading Screen first
+    switchStep("step1", "stepLoading");
+
+    // Wait 1.5 seconds then show QR Screen
+    setTimeout(() => {
+        showQRScreen(TIME_LIMIT);
+    }, 1500);
 }
 
 function showQRScreen(durationMs) {
-    switchStep("step1", "step2");
+    switchStep("stepLoading", "step2");
     document.getElementById("amountDisplay").innerText = "₹" + currentAmount;
 
     const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${currentAmount}&tn=${currentNote}&tr=${currentNote}&cu=INR`;
     
     document.getElementById("qrcode").innerHTML = "";
     new QRCode(document.getElementById("qrcode"), { 
-        text: upiUrl, width: 200, height: 200, 
+        text: upiUrl, width: 180, height: 180, 
         colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H 
     });
 
@@ -85,7 +93,7 @@ async function autoCheckPayment() {
             }
         }
     } catch (error) {
-        console.log("Waiting for payment...");
+        console.log("Checking payment status...");
     }
 }
 
