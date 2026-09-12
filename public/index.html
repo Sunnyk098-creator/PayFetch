@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sunny Kumar - Auto Payments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="payment-card">
+        <!-- STEP 1: Amount Entry -->
+        <div id="step1" class="step-container active">
+            <img src="https://cdn-icons-png.flaticon.com/512/2953/2953536.png" alt="Aesthetic" class="entry-gif">
+            <div class="entry-title">How much you want to pay?</div>
+            <div class="input-wrapper">
+                <span class="currency-symbol">₹</span>
+                <input type="number" id="customAmountInput" class="custom-amount-input" placeholder="0" min="1">
+            </div>
+            <button class="btn-submit" onclick="generatePayment()">Proceed to Pay</button>
+            <div class="footer"><img src="https://cdn-icons-png.flaticon.com/512/3064/3064155.png" class="inline-icon" alt="Lock"> Secure Auto-Verifying Payments</div>
+        </div>
+
+        <!-- STEP 2: QR Card -->
+        <div id="step2" class="step-container">
+            <div class="header">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Logo" class="logo">
+                <div class="name-container">
+                    <span class="name-text">SUNNY KUMAR</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/7641/7641727.png" alt="Verified" class="badge">
+                </div>
+                <div class="timer-box">Time left: <span id="timeRemaining">10:00</span></div>
+            </div>
+            <div class="amount-card" id="amountDisplay">₹0</div>
+            <div class="qr-container"><div id="qrcode"></div></div>
+            <div class="auto-fetch-loader"><div class="pulse-dot"></div> Verifying payment automatically...</div>
+            <button class="btn-cancel" onclick="cancelPayment()">Cancel Payment</button>
+        </div>
+
+        <!-- STEP 3: Success -->
+        <div id="step3" class="step-container">
+            <div class="success-icon"><img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success"></div>
+            <div class="status-text">Payment Successful</div>
+            <div class="sub-text">Your transaction has been verified instantly.</div>
+            <div class="receipt-box">
+                <div class="r-row"><span>Amount</span><span id="s_amt" class="success-color">₹0</span></div>
+                <div class="r-row"><span>Sender</span><span id="s_name">Unknown</span></div>
+                <div class="r-row"><span>Time</span><span id="s_time">--:--</span></div>
+            </div>
+            <button class="btn-submit" onclick="resetGateway()" style="margin-top:0;">Create New Payment</button>
+        </div>
+    </div>
+    <script src="/script.js"></script>
+</body>
+</html>
