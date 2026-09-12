@@ -3,8 +3,19 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// HIDDEN GAS URL
+// 🔒 HIDDEN GAS URL
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx9G6idQXbdHVR3gNqFfnSrvWr5jRLUIJ9VTkiczGBVDn-y6Yr4FPGB8pYYLohnbaImWw/exec";
+
+// Allow static images and GIFs to load normally
+app.use(express.static(path.join(__dirname, 'public'), {
+    index: false,
+    setHeaders: (res, path, stat) => {
+        // Prevent direct access to js and css via express static
+        if (path.endsWith('.js') || path.endsWith('.css')) {
+            res.setHeader('Cache-Control', 'no-store');
+        }
+    }
+}));
 
 // Serve Main HTML
 app.get('/', (req, res) => {
@@ -16,7 +27,7 @@ app.get('/style.css', (req, res) => {
     if (req.headers['sec-fetch-dest'] === 'style') {
         res.sendFile(path.join(__dirname, 'public', 'style.css'));
     } else {
-        res.status(400).send("invalid parameters");
+        res.status(403).json({ error: "Access Denied: Invalid Request" });
     }
 });
 
@@ -25,11 +36,11 @@ app.get('/script.js', (req, res) => {
     if (req.headers['sec-fetch-dest'] === 'script') {
         res.sendFile(path.join(__dirname, 'public', 'script.js'));
     } else {
-        res.status(400).send("invalid parameters");
+        res.status(403).json({ error: "Access Denied: Invalid Request" });
     }
 });
 
-// ✅ SECURE INTERNAL API
+// ✅ SECURE INTERNAL API (Auto-fetch)
 app.get('/api/fetch', async (req, res) => {
     const { note } = req.query;
     if (!note) return res.status(400).json({ error: "invalid parameters" });
