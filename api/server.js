@@ -5,30 +5,30 @@ const app = express();
 // 🔒 HIDDEN GOOGLE APP SCRIPT URL
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx9G6idQXbdHVR3gNqFfnSrvWr5jRLUIJ9VTkiczGBVDn-y6Yr4FPGB8pYYLohnbaImWw/exec";
 
-// ✅ 1. SERVE MAIN HTML (Fixes the 404 / error)
-app.get('/', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'index.html'));
-});
+// Main folder ka path (kyunki server.js ab 'api' folder mein hai)
+const rootDir = path.join(__dirname, '..');
 
-// 🛑 2. SECURE CSS ROUTE
+// 🛑 1. SECURE CSS ROUTE
 app.get('/style.css', (req, res) => {
+    // Check agar website ne CSS maanga hai (valid) ya user ne direct link open kiya hai (invalid)
     if (req.headers['sec-fetch-dest'] === 'style') {
-        res.sendFile(path.join(process.cwd(), 'style.css'));
+        res.sendFile(path.join(rootDir, 'style.css'));
     } else {
         res.status(400).json({ error: "invalid parameters" });
     }
 });
 
-// 🛑 3. SECURE JS ROUTE
+// 🛑 2. SECURE JS ROUTE
 app.get('/script.js', (req, res) => {
+    // Check agar website ne JS maanga hai (valid)
     if (req.headers['sec-fetch-dest'] === 'script') {
-        res.sendFile(path.join(process.cwd(), 'script.js'));
+        res.sendFile(path.join(rootDir, 'script.js'));
     } else {
         res.status(400).json({ error: "invalid parameters" });
     }
 });
 
-// ✅ 4. SECURE API FETCH (Hidden backend calling Google)
+// ✅ 3. SECURE API FETCH (Hidden backend calling Google)
 app.get('/api/fetch', async (req, res) => {
     const { note } = req.query;
     if (!note) return res.status(400).json({ error: "invalid parameters" });
@@ -41,9 +41,6 @@ app.get('/api/fetch', async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
-// ✅ 5. SERVE ALL OTHER FILES (GIFs, JPGs) NORMALLY
-app.use(express.static(process.cwd()));
 
 // Vercel Serverless Function ke liye export
 module.exports = app;
