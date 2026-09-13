@@ -6,34 +6,48 @@ let currentData = { method: null, amount: 0, note: "", time: 0, invoiceId: null,
 let timerInterval = null;
 let pollingInterval = null;
 
-// LOAD PERSISTENT STATE ON REFRESH
+// LOAD PERSISTENT STATE ON REFRESH (Fixed Blank Screen Issue)
 window.onload = () => {
     const saved = localStorage.getItem("nexaActiveTxn");
     if (saved) {
-        const parsed = JSON.parse(saved);
-        const timePassed = Date.now() - parsed.time;
-        if (timePassed < TIME_LIMIT) {
-            currentData = parsed;
-            document.getElementById("step0").classList.remove("active");
-            document.getElementById("step0").style.display = "none";
-            
-            if (currentData.method === "upi") { showUpiScreen(TIME_LIMIT - timePassed); } 
-            else if (currentData.method === "payzy") { showPayzyScreen(TIME_LIMIT - timePassed); }
-        } else {
+        try {
+            const parsed = JSON.parse(saved);
+            const timePassed = Date.now() - parsed.time;
+            if (timePassed < TIME_LIMIT) {
+                currentData = parsed;
+                // Let switchStep safely handle the transition without crashing
+                if (currentData.method === "upi") { 
+                    showUpiScreen(TIME_LIMIT - timePassed); 
+                } else if (currentData.method === "payzy") { 
+                    showPayzyScreen(TIME_LIMIT - timePassed); 
+                }
+            } else {
+                localStorage.removeItem("nexaActiveTxn");
+            }
+        } catch (e) {
             localStorage.removeItem("nexaActiveTxn");
         }
     }
 };
 
+// Safely Switch Between Screens
 function switchStep(fromId, toId) {
-    const fromEl = document.getElementById(fromId);
+    const fromEl = fromId ? document.getElementById(fromId) : null;
     const toEl = document.getElementById(toId);
-    fromEl.classList.remove("active");
-    setTimeout(() => {
-        fromEl.style.display = "none";
+    
+    if (fromEl) {
+        fromEl.classList.remove("active");
+        setTimeout(() => {
+            fromEl.style.display = "none";
+            if (toEl) {
+                toEl.style.display = "flex";
+                setTimeout(() => toEl.classList.add("active"), 30);
+            }
+        }, 400); 
+    } else if (toEl) {
         toEl.style.display = "flex";
         setTimeout(() => toEl.classList.add("active"), 30);
-    }, 400); 
+    }
 }
 
 function selectMethod(method) {
@@ -49,7 +63,8 @@ function generatePayment() {
     currentData.note = "SK" + Math.floor(10000 + Math.random() * 90000); 
     currentData.time = Date.now();
     
-    switchStep("step1", "stepLoading");
+    const activeStep = document.querySelector(".step-container.active");
+    switchStep(activeStep ? activeStep.id : "step1", "stepLoading");
 
     if (currentData.method === "upi") {
         setTimeout(() => {
@@ -63,7 +78,9 @@ function generatePayment() {
 
 // ----------------- UPI LOGIC -----------------
 function showUpiScreen(durationMs) {
-    switchStep(document.querySelector(".step-container.active").id, "stepUpi");
+    const activeStep = document.querySelector(".step-container.active");
+    switchStep(activeStep ? activeStep.id : "step0", "stepUpi");
+    
     document.getElementById("amountDisplayUpi").innerText = "₹" + currentData.amount;
 
     const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${currentData.amount}&tn=${currentData.note}&tr=${currentData.note}&cu=INR`;
@@ -112,7 +129,9 @@ async function createPayzyInvoice() {
 }
 
 function showPayzyScreen(durationMs) {
-    switchStep(document.querySelector(".step-container.active").id, "stepPayzy");
+    const activeStep = document.querySelector(".step-container.active");
+    switchStep(activeStep ? activeStep.id : "step0", "stepPayzy");
+    
     document.getElementById("amountDisplayPayzy").innerText = "₹" + currentData.amount;
     startTimer(durationMs, "timeRemainingPayzy");
 }
@@ -146,17 +165,24 @@ async function verifyPayzyPayment() {
 }
 
 // ----------------- COMMON LOGIC -----------------
-function saveData() { localStorage.setItem("nexaActiveTxn", JSON.stringify(currentData)); }
+function saveData() { 
+    localStorage.setItem("nexaActiveTxn", JSON.stringify(currentData)); 
+}
 
 function startTimer(durationMs, elementId) {
+    if (timerInterval) clearInterval(timerInterval);
+    
     let timeLeft = Math.floor(durationMs / 1000);
     timerInterval = setInterval(() => {
         if (timeLeft <= 0) {
-            cancelPayment(); alert("Payment session expired!"); return;
+            cancelPayment(); 
+            alert("Payment session expired!");
+            return;
         }
         let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
         let s = (timeLeft % 60).toString().padStart(2, '0');
-        document.getElementById(elementId).innerText = `${m}:${s}`;
+        const el = document.getElementById(elementId);
+        if (el) el.innerText = `${m}:${s}`;
         timeLeft--;
     }, 1000);
 }
@@ -184,7 +210,10 @@ function cancelPayment() {
     document.getElementById("customAmountInput").value = "";
     document.getElementById('errorOverlay').style.display = 'none';
     
-    switchStep(document.querySelector(".step-container.active").id, "step0");
+    const activeStep = document.querySelector(".step-container.active");
+    switchStep(activeStep ? activeStep.id : "stepPayzy", "step0"); // Navigate back to method selection
 }
 
-function resetGateway() { cancelPayment(); }
+function resetGateway() { 
+    cancelPayment(); 
+}
