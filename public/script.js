@@ -2,15 +2,7 @@ const UPI_ID = "sunnypro@fam";
 const UPI_NAME = "Sunny Kumar";
 const TIME_LIMIT = 10 * 60 * 1000; 
 
-let currentData = {
-    method: null,
-    amount: 0,
-    note: "",
-    time: 0,
-    invoiceId: null,
-    paymentUrl: null
-};
-
+let currentData = { method: null, amount: 0, note: "", time: 0, invoiceId: null, paymentUrl: null };
 let timerInterval = null;
 let pollingInterval = null;
 
@@ -25,11 +17,8 @@ window.onload = () => {
             document.getElementById("step0").classList.remove("active");
             document.getElementById("step0").style.display = "none";
             
-            if (currentData.method === "upi") {
-                showUpiScreen(TIME_LIMIT - timePassed);
-            } else if (currentData.method === "payzy") {
-                showPayzyScreen(TIME_LIMIT - timePassed);
-            }
+            if (currentData.method === "upi") { showUpiScreen(TIME_LIMIT - timePassed); } 
+            else if (currentData.method === "payzy") { showPayzyScreen(TIME_LIMIT - timePassed); }
         } else {
             localStorage.removeItem("nexaActiveTxn");
         }
@@ -96,9 +85,7 @@ async function autoCheckUpi() {
             const verifiedTxn = result.data.find(txn => 
                 txn.type === "Credit" && parseFloat(txn.amount) === currentData.amount && txn.purpose.includes(currentData.note)
             );
-            if (verifiedTxn) {
-                paymentSuccess(verifiedTxn.amount, verifiedTxn.name, "stepUpi");
-            }
+            if (verifiedTxn) { paymentSuccess(verifiedTxn.amount, verifiedTxn.name, "stepUpi"); }
         }
     } catch (e) {}
 }
@@ -130,44 +117,42 @@ function showPayzyScreen(durationMs) {
     startTimer(durationMs, "timeRemainingPayzy");
 }
 
-function openPayzyIframe() {
-    document.getElementById("payzyIframe").src = currentData.paymentUrl;
-    document.getElementById("iframeOverlay").style.display = "flex";
-}
-
-function closePayzyIframe() {
-    document.getElementById("iframeOverlay").style.display = "none";
+function openPayzy() {
+    if (currentData.paymentUrl) {
+        window.open(currentData.paymentUrl, "_blank");
+    }
 }
 
 async function verifyPayzyPayment() {
+    const btn = document.getElementById("verifyPayzyBtn");
+    const originalText = btn.innerText;
+    btn.innerText = "Verifying...";
+    
     try {
-        // API hit to check status
         const response = await fetch(`/api/payzy/status?invoice_id=${currentData.invoiceId}`);
         const result = await response.json();
+        
+        btn.innerText = originalText;
 
         if (result.inv_status === "paid" || result.status === "success") {
-            closePayzyIframe();
             paymentSuccess(result.amount || currentData.amount, result.payer_mobile || "Verified Payzy User", "stepPayzy");
         } else {
             document.getElementById('errorOverlay').style.display = 'flex';
         }
     } catch (e) {
+        btn.innerText = originalText;
         document.getElementById('errorOverlay').style.display = 'flex';
     }
 }
 
 // ----------------- COMMON LOGIC -----------------
-function saveData() {
-    localStorage.setItem("nexaActiveTxn", JSON.stringify(currentData));
-}
+function saveData() { localStorage.setItem("nexaActiveTxn", JSON.stringify(currentData)); }
 
 function startTimer(durationMs, elementId) {
     let timeLeft = Math.floor(durationMs / 1000);
     timerInterval = setInterval(() => {
         if (timeLeft <= 0) {
-            cancelPayment(); 
-            alert("Payment session expired!");
-            return;
+            cancelPayment(); alert("Payment session expired!"); return;
         }
         let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
         let s = (timeLeft % 60).toString().padStart(2, '0');
@@ -197,13 +182,9 @@ function cancelPayment() {
     
     currentData = { method: null, amount: 0, note: "", time: 0, invoiceId: null, paymentUrl: null };
     document.getElementById("customAmountInput").value = "";
-    
-    closePayzyIframe();
     document.getElementById('errorOverlay').style.display = 'none';
     
     switchStep(document.querySelector(".step-container.active").id, "step0");
 }
 
-function resetGateway() {
-    cancelPayment();
-}
+function resetGateway() { cancelPayment(); }
