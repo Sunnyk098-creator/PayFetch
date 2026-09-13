@@ -11,15 +11,7 @@
 <body>
     <div class="payment-card">
         
-        <div id="step0" class="step-container active">
-            <img src="moneyfly.gif" alt="Aesthetic" class="entry-gif">
-            <div class="entry-title">Select Payment Method</div>
-            <button class="btn-submit" style="margin-bottom: 10px;" onclick="selectMethod('payzy')">Pay via Payzy</button>
-            <button class="btn-submit" style="background: linear-gradient(135deg, #20c997, #0b7a59);" onclick="selectMethod('upi')">Pay via UPI QR</button>
-            <div class="footer"><img src="lock.gif" class="inline-icon" alt="Lock"> Secure Auto-Verifying Payments</div>
-        </div>
-
-        <div id="step1" class="step-container">
+        <div id="step1" class="step-container active">
             <img src="moneyfly.gif" alt="Aesthetic" class="entry-gif">
             <div class="entry-title">How much you want to pay?</div>
             <div class="input-wrapper">
@@ -27,7 +19,7 @@
                 <input type="number" id="customAmountInput" class="custom-amount-input" placeholder="0" min="1">
             </div>
             <button class="btn-submit" onclick="generatePayment()">Proceed to Pay</button>
-            <button class="btn-cancel" onclick="cancelPayment()">Back</button>
+            <div class="footer"><img src="lock.gif" class="inline-icon" alt="Lock"> Secure Auto-Verifying Payments</div>
         </div>
 
         <div id="stepLoading" class="step-container" style="justify-content: center; min-height: 350px;">
@@ -36,7 +28,7 @@
             <div class="sub-text">Please wait while we generate a secure link.</div>
         </div>
 
-        <div id="stepUpi" class="step-container">
+        <div id="step2" class="step-container">
             <div class="header">
                 <img src="logo.jpg" alt="Logo" class="logo">
                 <div class="name-container">
@@ -45,10 +37,10 @@
                     <img src="btick.gif" alt="Verified" class="badge">
                 </div>
                 <div class="timer-box">
-                    <img src="clock.gif" class="inline-icon" alt="Time"> Time left: <span id="timeRemainingUpi">10:00</span>
+                    <img src="clock.gif" class="inline-icon" alt="Time"> Time left: <span id="timeRemaining">10:00</span>
                 </div>
             </div>
-            <div class="amount-card" id="amountDisplayUpi">₹0</div>
+            <div class="amount-card" id="amountDisplay">₹0</div>
             
             <div class="qr-container">
                 <div id="qrcode"></div>
@@ -59,28 +51,7 @@
             <button class="btn-cancel" onclick="cancelPayment()">Cancel Payment</button>
         </div>
 
-        <div id="stepPayzy" class="step-container">
-            <div class="header">
-                <img src="logo.jpg" alt="Logo" class="logo">
-                <div class="name-container">
-                    <span class="name-text">SUNNY KUMAR</span>
-                    <img src="crown.gif" alt="Crown" class="badge">
-                    <img src="btick.gif" alt="Verified" class="badge">
-                </div>
-                <div class="timer-box">
-                    <img src="clock.gif" class="inline-icon" alt="Time"> Time left: <span id="timeRemainingPayzy">10:00</span>
-                </div>
-            </div>
-            <div class="amount-card" id="amountDisplayPayzy">₹0</div>
-            
-            <div class="sub-text" style="margin-bottom: 15px;">Click 'Pay Now' to open secure payment gateway. Once paid, come back here to verify.</div>
-            
-            <button class="btn-submit" onclick="openPayzy()">1. Pay Now</button>
-            <button class="btn-submit" id="verifyPayzyBtn" style="background: linear-gradient(135deg, #20c997, #0b7a59); margin-top: 10px;" onclick="verifyPayzyPayment()">2. I Have Paid (Verify)</button>
-            <button class="btn-cancel" onclick="cancelPayment()">Cancel Payment</button>
-        </div>
-
-        <div id="stepSuccess" class="step-container">
+        <div id="step3" class="step-container">
             <div class="success-icon"><img src="tick.gif" alt="Success"></div>
             <div class="status-text">Payment Successful</div>
             <div class="sub-text">Your transaction has been verified instantly.</div>
@@ -90,15 +61,6 @@
                 <div class="r-row"><span>Time</span><span id="s_time">--:--</span></div>
             </div>
             <button class="btn-submit" onclick="resetGateway()" style="margin-top:0;">Create New Payment</button>
-        </div>
-    </div>
-
-    <div id="errorOverlay">
-        <div class="status-card-inner">
-            <img src="x.gif" alt="Fail" class="status-gif" onerror="this.src='https://cdn-icons-png.flaticon.com/512/190/190406.png'">
-            <div class="status-text" style="color: #ff6b6b;">Verification Failed</div>
-            <div class="sub-text" style="font-weight: 700; color: #d63031;">Payment not found or not completed.</div>
-            <button class="btn-submit" onclick="document.getElementById('errorOverlay').style.display='none'" style="margin-top: 15px;">Try Again</button>
         </div>
     </div>
 
