@@ -72,9 +72,11 @@
                 </div>
             </div>
             <div class="amount-card" id="amountDisplayPayzy">₹0</div>
-            <div class="sub-text" style="margin-bottom: 20px;">Click below to open secure payment gateway.</div>
             
-            <button class="btn-submit" onclick="openPayzyIframe()">Pay Now</button>
+            <div class="sub-text" style="margin-bottom: 15px;">Click 'Pay Now' to open secure payment gateway. Once paid, come back here to verify.</div>
+            
+            <button class="btn-submit" onclick="openPayzy()">1. Pay Now</button>
+            <button class="btn-submit" id="verifyPayzyBtn" style="background: linear-gradient(135deg, #20c997, #0b7a59); margin-top: 10px;" onclick="verifyPayzyPayment()">2. I Have Paid (Verify)</button>
             <button class="btn-cancel" onclick="cancelPayment()">Cancel Payment</button>
         </div>
 
@@ -89,14 +91,6 @@
             </div>
             <button class="btn-submit" onclick="resetGateway()" style="margin-top:0;">Create New Payment</button>
         </div>
-    </div>
-
-    <div id="iframeOverlay">
-        <div class="iframe-header">
-            <button class="iframe-btn btn-close" onclick="closePayzyIframe()">Close</button>
-            <button class="iframe-btn btn-paid" onclick="verifyPayzyPayment()">I have Paid</button>
-        </div>
-        <iframe id="payzyIframe" src="" frameborder="0"></iframe>
     </div>
 
     <div id="errorOverlay">
