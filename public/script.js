@@ -6,6 +6,7 @@ let currentAmount = 0;
 let currentNote = "";
 let timerInterval = null;
 let pollingInterval = null;
+let selectedMethod = "upi"; // Tracks user selection
 
 function switchStep(fromId, toId) {
     const fromEl = document.getElementById(fromId);
@@ -20,6 +21,12 @@ function switchStep(fromId, toId) {
     }, 400); 
 }
 
+// Set selected method and move to enter amount screen
+function selectMethod(method) {
+    selectedMethod = method;
+    switchStep("step0", "step1");
+}
+
 function generatePayment() {
     const amt = document.getElementById("customAmountInput").value;
     if (!amt || amt <= 0) { alert("Please enter a valid amount!"); return; }
@@ -27,13 +34,39 @@ function generatePayment() {
     currentAmount = parseFloat(amt);
     currentNote = "SK" + Math.floor(10000 + Math.random() * 90000); 
     
-    // Switch to Loading Screen first
-    switchStep("step1", "stepLoading");
+    if (selectedMethod === "upi") {
+        // Standard UPI Flow
+        switchStep("step1", "stepLoading");
+        setTimeout(() => {
+            showQRScreen(TIME_LIMIT);
+        }, 1500);
+    } else if (selectedMethod === "payzy") {
+        // Payzy API Flow
+        switchStep("step1", "stepPayzyInstructions");
+        // User gets 3.5 seconds to read instructions before redirect
+        setTimeout(() => {
+            processPayzyPayment(currentAmount, currentNote);
+        }, 3500); 
+    }
+}
 
-    // Wait 1.5 seconds then show QR Screen
-    setTimeout(() => {
-        showQRScreen(TIME_LIMIT);
-    }, 1500);
+// Function to call secure backend API and redirect
+async function processPayzyPayment(amount, orderId) {
+    try {
+        const response = await fetch(`/api/payzy/create?amount=${amount}&order_id=${orderId}`);
+        const result = await response.json();
+
+        if (result.status === "success" && result.payment_url) {
+            window.location.href = result.payment_url; // Redirect to external URL
+        } else {
+            alert("Failed to create Payzy link. Server may be down.");
+            switchStep("stepPayzyInstructions", "step1");
+        }
+    } catch (error) {
+        console.error("Error generating Payzy link:", error);
+        alert("Something went wrong!");
+        switchStep("stepPayzyInstructions", "step1");
+    }
 }
 
 function showQRScreen(durationMs) {
@@ -102,10 +135,12 @@ function cancelPayment() {
     clearInterval(pollingInterval);
     currentAmount = 0; currentNote = "";
     document.getElementById("customAmountInput").value = "";
-    switchStep("step2", "step1");
+    // Send them back to selection screen on cancel
+    switchStep("step2", "step0"); 
 }
 
 function resetGateway() {
     document.getElementById("customAmountInput").value = "";
-    switchStep("step3", "step1");
+    // Send them back to selection screen on finish
+    switchStep("step3", "step0");
 }
