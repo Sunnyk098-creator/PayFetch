@@ -6,7 +6,7 @@ let currentAmount = 0;
 let currentNote = "";
 let timerInterval = null;
 let pollingInterval = null;
-let selectedMethod = "upi"; // Tracks user selection
+let selectedMethod = "upi"; 
 
 function switchStep(fromId, toId) {
     const fromEl = document.getElementById(fromId);
@@ -16,15 +16,28 @@ function switchStep(fromId, toId) {
     setTimeout(() => {
         fromEl.style.display = "none";
         toEl.style.display = "flex";
-        // Chhota delay taaki display flex apply ho jaye animation se pehle
         setTimeout(() => toEl.classList.add("active"), 30);
     }, 400); 
 }
 
-// Set selected method and move to enter amount screen
 function selectMethod(method) {
     selectedMethod = method;
+    
+    const gatewayNameEl = document.getElementById("gatewayName");
+    if(method === 'upi') {
+        gatewayNameEl.innerText = "UPI";
+        gatewayNameEl.style.color = "#6a11cb"; 
+    } else {
+        gatewayNameEl.innerText = "PAYZY";
+        gatewayNameEl.style.color = "#11998e"; 
+    }
+    
     switchStep("step0", "step1");
+}
+
+function goBackToMethodSelection() {
+    switchStep("step1", "step0");
+    document.getElementById("customAmountInput").value = ""; 
 }
 
 function generatePayment() {
@@ -35,29 +48,25 @@ function generatePayment() {
     currentNote = "SK" + Math.floor(10000 + Math.random() * 90000); 
     
     if (selectedMethod === "upi") {
-        // Standard UPI Flow
         switchStep("step1", "stepLoading");
         setTimeout(() => {
             showQRScreen(TIME_LIMIT);
         }, 1500);
     } else if (selectedMethod === "payzy") {
-        // Payzy API Flow
         switchStep("step1", "stepPayzyInstructions");
-        // User gets 3.5 seconds to read instructions before redirect
         setTimeout(() => {
             processPayzyPayment(currentAmount, currentNote);
         }, 3500); 
     }
 }
 
-// Function to call secure backend API and redirect
 async function processPayzyPayment(amount, orderId) {
     try {
         const response = await fetch(`/api/payzy/create?amount=${amount}&order_id=${orderId}`);
         const result = await response.json();
 
         if (result.status === "success" && result.payment_url) {
-            window.location.href = result.payment_url; // Redirect to external URL
+            window.location.href = result.payment_url; 
         } else {
             alert("Failed to create Payzy link. Server may be down.");
             switchStep("stepPayzyInstructions", "step1");
@@ -135,12 +144,10 @@ function cancelPayment() {
     clearInterval(pollingInterval);
     currentAmount = 0; currentNote = "";
     document.getElementById("customAmountInput").value = "";
-    // Send them back to selection screen on cancel
     switchStep("step2", "step0"); 
 }
 
 function resetGateway() {
     document.getElementById("customAmountInput").value = "";
-    // Send them back to selection screen on finish
     switchStep("step3", "step0");
 }
