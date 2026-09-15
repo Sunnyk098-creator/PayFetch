@@ -11,7 +11,15 @@
 <body>
     <div class="payment-card">
         
-        <div id="step1" class="step-container active">
+        <div id="step0" class="step-container active">
+            <img src="moneybag.gif" alt="Choose Method" class="entry-gif">
+            <div class="entry-title">Select Payment Method</div>
+            <button class="btn-submit" onclick="selectMethod('upi')" style="margin-bottom: 15px;">Pay On UPI</button>
+            <button class="btn-submit" onclick="selectMethod('payzy')" style="background: linear-gradient(135deg, #11998e, #38ef7d);">Pay On Payzy</button>
+            <div class="footer"><img src="lock.gif" class="inline-icon" alt="Lock"> Secure Gateway Selection</div>
+        </div>
+
+        <div id="step1" class="step-container">
             <img src="moneybag.gif" alt="Aesthetic" class="entry-gif">
             <div class="entry-title">How much you want to pay?</div>
             <div class="input-wrapper">
@@ -20,6 +28,16 @@
             </div>
             <button class="btn-submit" onclick="generatePayment()">Proceed to Pay</button>
             <div class="footer"><img src="lock.gif" class="inline-icon" alt="Lock"> Secure Auto-Verifying Payments</div>
+        </div>
+
+        <div id="stepPayzyInstructions" class="step-container" style="justify-content: center; min-height: 350px;">
+            <img src="light.gif" alt="Instructions" class="status-gif" style="max-width: 120px; margin-bottom: 20px;">
+            <div class="status-text" style="font-size: 1.4rem; color: #333;">Action Required!</div>
+            <div class="sub-text" style="font-size: 1rem; color: #d32f2f; font-weight: 600; padding: 0 10px;">
+                ⚠️ Pay within 2 minutes.<br><br>
+                Enter your PIN and click "Authorised Payment" button on the next site.
+            </div>
+            <div class="sub-text" style="margin-top: 15px; color: #0b7a59;">Redirecting to secure gateway...</div>
         </div>
 
         <div id="stepLoading" class="step-container" style="justify-content: center; min-height: 350px;">
