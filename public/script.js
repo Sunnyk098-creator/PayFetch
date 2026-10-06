@@ -82,7 +82,10 @@ function showQRScreen(durationMs) {
     switchStep("stepLoading", "step2");
     document.getElementById("amountDisplay").innerText = "₹" + currentAmount;
 
-    const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${currentAmount}&tn=${currentNote}&tr=${currentNote}&cu=INR`;
+    // FIX: Encode all text parameters properly to avoid invalid QR errors
+    const safeName = encodeURIComponent(UPI_NAME);
+    const safeNote = encodeURIComponent(currentNote);
+    const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${safeName}&am=${currentAmount}&tn=${safeNote}&tr=${safeNote}&cu=INR`;
     
     document.getElementById("qrcode").innerHTML = "";
     new QRCode(document.getElementById("qrcode"), { 
