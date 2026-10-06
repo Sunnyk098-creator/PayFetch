@@ -42,4 +42,34 @@ app.get('/api/fetch', async (req, res) => {
     }
 });
 
+// ✅ 4. RAW JSON API FETCH (TRANSACTION)
+app.get('/transction=:id', async (req, res) => {
+    try {
+        const response = await fetch(`${GAS_API_URL}?txnid=${req.params.id}`);
+        const data = await response.json();
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(data, null, 4));
+    } catch (error) { res.status(500).json({ error: "Internal Server Error" }); }
+});
+
+// ✅ 5. RAW JSON API FETCH (UTR)
+app.get('/utr=:id', async (req, res) => {
+    try {
+        const response = await fetch(`${GAS_API_URL}?utr=${req.params.id}`);
+        const data = await response.json();
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(data, null, 4));
+    } catch (error) { res.status(500).json({ error: "Internal Server Error" }); }
+});
+
+// ✅ 6. RAW JSON API FETCH (PURPOSE)
+app.get('/purpose=:id', async (req, res) => {
+    try {
+        const response = await fetch(`${GAS_API_URL}?q=${req.params.id}`);
+        const data = await response.json();
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(data, null, 4));
+    } catch (error) { res.status(500).json({ error: "Internal Server Error" }); }
+});
+
 module.exports = app;
